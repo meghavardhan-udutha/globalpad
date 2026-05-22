@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlobalPad — Secure File Sharing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --dark: #141414;
+    --mid: #1e1e1e;
+    --border: #2a2a2a;
+    --gray-dim: #444;
+    --gray: #888;
+    --gray-light: #bbb;
+    --white: #f0f0f0;
+    --red: #e03030;
+    --red-dim: #7a1a1a;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--sans);
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--red);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg { width: 18px; height: 18px; fill: var(--white); }
+
+  .logo-text {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .logo-text span { color: var(--red); }
+
+  /* ── Hero ── */
+  .hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    text-align: center;
+  }
+
+  .tag-line {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 24px;
+    border: 1px solid var(--red-dim);
+    display: inline-block;
+    padding: 4px 12px;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--gray);
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--gray);
+    font-weight: 300;
+    max-width: 400px;
+    line-height: 1.6;
+    margin-bottom: 64px;
+  }
+
+  /* ── Cards ── */
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    width: 100%;
+    max-width: 720px;
+    border: 1px solid var(--border);
+  }
+
+  .card {
+    background: var(--dark);
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s ease;
+  }
+
+  .card:hover { background: var(--mid); }
+  .card:hover::before { transform: scaleX(1); }
+
+  .card-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gray-dim);
+    letter-spacing: 0.15em;
+  }
+
+  .card-icon {
+    width: 44px; height: 44px;
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    margin-bottom: 4px;
+    transition: border-color 0.15s;
+  }
+
+  .card:hover .card-icon { border-color: var(--red); }
+  .card-icon svg { width: 22px; height: 22px; stroke: var(--gray-light); stroke-width: 1.5; fill: none; }
+
+  .card-title {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.01em;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .card-action {
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-action::after {
+    content: '→';
+    transition: transform 0.15s;
+  }
+
+  .card:hover .card-action::after { transform: translateX(4px); }
+
+  /* ── Footer ── */
+  footer {
+    padding: 20px 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer p {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gray-dim);
+    letter-spacing: 0.08em;
+  }
+
+  .status-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gray-dim);
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #2a9d2a;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @media (max-width: 560px) {
+    header { padding: 20px; }
+    .hero { padding: 40px 20px; }
+    .cards { grid-template-columns: 1fr; }
+    .card { padding: 36px 28px; }
+    footer { flex-direction: column; gap: 8px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 4h12M6 12h12M6 16h8"/></svg>
+  </div>
+  <span class="logo-text">Global<span>Pad</span></span>
+</header>
+
+<main class="hero">
+  <span class="tag-line">Code-based file sharing</span>
+  <h1>Drop it.<br><em>Share the code.</em></h1>
+  <p class="subtitle">No accounts. No sign-up. Enter a code to share text and files with anyone.</p>
+
+  <div class="cards">
+    <a href="/access/" class="card">
+      <span class="card-num">01</span>
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      </div>
+      <span class="card-title">Access Files</span>
+      <span class="card-desc">Enter your access code to view text, download documents, PDFs, and images.</span>
+      <span class="card-action">Enter Code</span>
+    </a>
+
+    <a href="/upload/" class="card">
+      <span class="card-num">02</span>
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      </div>
+      <span class="card-title">Upload Files</span>
+      <span class="card-desc">Create a pad with a custom code. Add text, attach files. Share the code.</span>
+      <span class="card-action">Create Pad</span>
+    </a>
+  </div>
+</main>
+
+<footer>
+  <p>GLOBALPAD / SECURE SHARING</p>
+  <div class="status-dot">
+    <span class="dot"></span>
+    <span>SYSTEM ONLINE</span>
+  </div>
+</footer>
+
+</body>
+</html>

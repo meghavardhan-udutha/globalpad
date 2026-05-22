@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Access Files — GlobalPad</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --dark: #141414;
+    --mid: #1e1e1e;
+    --border: #2a2a2a;
+    --gray-dim: #444;
+    --gray: #888;
+    --gray-light: #bbb;
+    --white: #f0f0f0;
+    --red: #e03030;
+    --red-dim: #7a1a1a;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  html, body { min-height: 100%; background: var(--black); color: var(--white); font-family: var(--sans); }
+
+  header {
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none; color: inherit;
+  }
+
+  .logo-mark {
+    width: 32px; height: 32px; background: var(--red);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+
+  .logo-mark svg { width: 18px; height: 18px; fill: var(--white); }
+
+  .logo-text {
+    font-family: var(--mono); font-size: 15px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--white);
+  }
+
+  .logo-text span { color: var(--red); }
+
+  .back-link {
+    font-family: var(--mono); font-size: 11px; color: var(--gray);
+    text-decoration: none; letter-spacing: 0.1em;
+    display: flex; align-items: center; gap: 6px;
+    transition: color 0.15s;
+  }
+
+  .back-link:hover { color: var(--white); }
+
+  .main { max-width: 760px; margin: 0 auto; padding: 60px 40px; }
+
+  .page-label {
+    font-family: var(--mono); font-size: 11px; color: var(--red);
+    letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .page-label::before {
+    content: ''; width: 20px; height: 1px; background: var(--red);
+  }
+
+  h1 {
+    font-family: var(--mono); font-size: 32px; font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 40px;
+  }
+
+  /* ── Code input section ── */
+  .input-section {
+    border: 1px solid var(--border);
+    padding: 32px;
+    margin-bottom: 40px;
+    background: var(--dark);
+  }
+
+  .input-label {
+    font-family: var(--mono); font-size: 11px; color: var(--gray);
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px;
+    display: block;
+  }
+
+  .input-row {
+    display: flex; gap: 0;
+  }
+
+  .code-input {
+    flex: 1;
+    background: var(--black);
+    border: 1px solid var(--border);
+    border-right: none;
+    color: var(--white);
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+
+  .code-input::placeholder { color: var(--gray-dim); font-weight: 400; letter-spacing: 0.1em; }
+  .code-input:focus { border-color: var(--red); }
+
+  .fetch-btn {
+    background: var(--red);
+    border: 1px solid var(--red);
+    color: var(--white);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .fetch-btn:hover { background: #c02020; }
+  .fetch-btn:disabled { background: var(--gray-dim); border-color: var(--gray-dim); cursor: not-allowed; }
+
+  /* ── Error ── */
+  .error-box {
+    border: 1px solid var(--red-dim);
+    background: rgba(224,48,48,0.07);
+    padding: 16px 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: #e07070;
+    margin-top: 16px;
+    display: none;
+  }
+
+  /* ── Results ── */
+  .result-section { display: none; }
+
+  .result-header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px; margin-bottom: 28px;
+  }
+
+  .result-code {
+    font-family: var(--mono); font-size: 13px;
+    color: var(--gray);
+  }
+
+  .result-code strong {
+    color: var(--red); font-size: 16px; margin-left: 6px; letter-spacing: 0.1em;
+  }
+
+  .result-meta {
+    font-family: var(--mono); font-size: 11px; color: var(--gray-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* Text content */
+  .text-block {
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-family: var(--mono); font-size: 11px; color: var(--gray);
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  .text-content {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    padding: 20px 24px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--gray-light);
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: var(--sans);
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  /* Files */
+  .files-grid {
+    display: flex; flex-direction: column; gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .file-item {
+    background: var(--dark);
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px;
+    transition: background 0.1s;
+  }
+
+  .file-item:hover { background: var(--mid); }
+
+  .file-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border: 1px solid var(--border);
+    display: grid; place-items: center;
+    background: var(--black);
+  }
+
+  .file-icon svg { width: 18px; height: 18px; stroke: var(--gray); stroke-width: 1.5; fill: none; }
+  .file-icon.type-image svg { stroke: #4a9eff; }
+  .file-icon.type-pdf svg { stroke: var(--red); }
+  .file-icon.type-document svg { stroke: #aaa; }
+
+  .file-info { flex: 1; min-width: 0; }
+
+  .file-name {
+    font-family: var(--mono); font-size: 13px; color: var(--white);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+
+  .file-meta {
+    font-family: var(--mono); font-size: 11px; color: var(--gray-dim);
+    display: flex; gap: 12px;
+  }
+
+  .file-type-badge {
+    font-family: var(--mono); font-size: 10px;
+    padding: 2px 6px; letter-spacing: 0.08em; text-transform: uppercase;
+    background: var(--border); color: var(--gray);
+  }
+
+  .download-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--gray-light); font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 7px 14px; cursor: pointer; text-decoration: none;
+    transition: border-color 0.15s, color 0.15s; flex-shrink: 0;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .download-btn:hover { border-color: var(--white); color: var(--white); }
+  .download-btn svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+  /* Loading */
+  .loading {
+    display: none; padding: 16px 0;
+    font-family: var(--mono); font-size: 12px; color: var(--gray);
+    letter-spacing: 0.1em; align-items: center; gap: 10px;
+  }
+
+  .spinner {
+    width: 16px; height: 16px; border: 2px solid var(--border);
+    border-top-color: var(--red); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    padding: 40px; text-align: center;
+    font-family: var(--mono); font-size: 13px; color: var(--gray-dim);
+    border: 1px solid var(--border); background: var(--dark);
+  }
+
+  @media (max-width: 560px) {
+    header { padding: 20px; }
+    .main { padding: 40px 20px; }
+    .input-section { padding: 24px 20px; }
+    .input-row { flex-direction: column; }
+    .code-input { border-right: 1px solid var(--border); border-bottom: none; }
+    .fetch-btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 4h12M6 12h12M6 16h8"/></svg>
+    </div>
+    <span class="logo-text">Global<span>Pad</span></span>
+  </a>
+  <a href="/" class="back-link">← Back</a>
+</header>
+
+<main class="main">
+  <div class="page-label">Access Files</div>
+  <h1>Enter Your Code</h1>
+
+  <div class="input-section">
+    <label class="input-label">Access Code</label>
+    <div class="input-row">
+      <input type="text" class="code-input" id="codeInput"
+             placeholder="e.g. MYCODE-123" maxlength="20"
+             autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="fetch-btn" id="fetchBtn" onclick="fetchPad()">Retrieve →</button>
+    </div>
+    <div class="error-box" id="errorBox"></div>
+    <div class="loading" id="loadingIndicator">
+      <div class="spinner"></div>
+      <span>FETCHING PAD...</span>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="result-section" id="resultSection">
+    <div class="result-header">
+      <div class="result-code">PAD CODE: <strong id="resultCode"></strong></div>
+      <div class="result-meta" id="resultMeta"></div>
+    </div>
+
+    <!-- Text content -->
+    <div class="text-block" id="textBlock" style="display:none">
+      <div class="section-title">Text Content</div>
+      <div class="text-content" id="textContent"></div>
+    </div>
+
+    <!-- Files -->
+    <div id="filesBlock" style="display:none">
+      <div class="section-title">Files</div>
+      <div class="files-grid" id="filesGrid"></div>
+    </div>
+
+    <div class="empty-state" id="emptyState" style="display:none">
+      NO CONTENT IN THIS PAD YET.
+    </div>
+  </div>
+</main>
+
+<script>
+  const input = document.getElementById('codeInput');
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') fetchPad(); });
+  input.addEventListener('input', () => {
+    input.value = input.value.toUpperCase().replace(/[^A-Z0-9\-_]/g, '');
+  });
+
+  function getFileIcon(type) {
+    if (type === 'image') return `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+    if (type === 'pdf') return `<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>`;
+    if (type === 'document') return `<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/><line x1="9" y1="9" x2="11" y2="9"/></svg>`;
+    return `<svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
+  }
+
+  async function fetchPad() {
+    const code = input.value.trim();
+    if (!code) { showError('Please enter an access code.'); return; }
+
+    hideError();
+    hideResult();
+    showLoading(true);
+    document.getElementById('fetchBtn').disabled = true;
+
+    try {
+      const res = await fetch(`/api/pad/${encodeURIComponent(code)}/`);
+      const data = await res.json();
+
+      if (!res.ok) { showError(data.error || 'Failed to fetch pad.'); return; }
+
+      renderResult(data);
+    } catch (e) {
+      showError('Network error. Please try again.');
+    } finally {
+      showLoading(false);
+      document.getElementById('fetchBtn').disabled = false;
+    }
+  }
+
+  function renderResult(data) {
+    document.getElementById('resultCode').textContent = data.code;
+    document.getElementById('resultMeta').textContent = `Updated ${data.updated_at}`;
+
+    const hasText = data.text && data.text.trim();
+    const hasFiles = data.files && data.files.length > 0;
+
+    if (hasText) {
+      document.getElementById('textContent').textContent = data.text;
+      document.getElementById('textBlock').style.display = 'block';
+    } else {
+      document.getElementById('textBlock').style.display = 'none';
+    }
+
+    if (hasFiles) {
+      const grid = document.getElementById('filesGrid');
+      grid.innerHTML = '';
+      data.files.forEach(f => {
+        const row = document.createElement('div');
+        row.className = 'file-item';
+        row.innerHTML = `
+          <div class="file-icon type-${f.type}">${getFileIcon(f.type)}</div>
+          <div class="file-info">
+            <div class="file-name">${escHtml(f.name)}</div>
+            <div class="file-meta">
+              <span>${f.size}</span>
+              <span class="file-type-badge">${f.type.toUpperCase()}</span>
+            </div>
+          </div>
+          <a href="/api/file/${f.id}/download/" class="download-btn" download>
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </a>`;
+        grid.appendChild(row);
+      });
+      document.getElementById('filesBlock').style.display = 'block';
+    } else {
+      document.getElementById('filesBlock').style.display = 'none';
+    }
+
+    if (!hasText && !hasFiles) {
+      document.getElementById('emptyState').style.display = 'block';
+    } else {
+      document.getElementById('emptyState').style.display = 'none';
+    }
+
+    document.getElementById('resultSection').style.display = 'block';
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('errorBox');
+    box.textContent = '⚠  ' + msg;
+    box.style.display = 'block';
+  }
+
+  function hideError() { document.getElementById('errorBox').style.display = 'none'; }
+  function hideResult() { document.getElementById('resultSection').style.display = 'none'; }
+  function showLoading(v) { document.getElementById('loadingIndicator').style.display = v ? 'flex' : 'none'; }
+</script>
+
+</body>
+</html>
